@@ -9,7 +9,7 @@ export class Node {
     return this.cost;
   }
 
-  get getPerson() {
+  get getPersonName() {
     return this.personName;
   }
 
@@ -25,7 +25,7 @@ export class Node {
     this.cost = cost;
   }
 
-  set setPerson(personName) {
+  set setPersonName(personName) {
     this.personName = personName;
   }
 
