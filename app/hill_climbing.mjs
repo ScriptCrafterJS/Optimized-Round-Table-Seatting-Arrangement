@@ -20,3 +20,15 @@ function calculateArrangementCost(arrangement) {
 
   return totalCost;
 }
+
+//generate all possible random neighbor arrangements out of single arrangement, so hill climbing can move around and see which is the best neighbor (lower arrangement cost)
+function generateNeighbors(arrangement) {
+  const neighbors = []; //array of arrays, each inner array is an arrangement
+  for (let i = 0; i < arrangement.length; i++) {
+    for (let j = i + 1; j < arrangement.length; j++) {
+      const neighbor = [...arrangement]; //copy the original arrangement
+      [neighbor[i], neighbor[j]] = [neighbor[j], neighbor[i]];
+    }
+  }
+  return neighbors;
+}
