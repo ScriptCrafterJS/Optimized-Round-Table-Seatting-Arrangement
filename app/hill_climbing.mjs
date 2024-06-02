@@ -1,25 +1,5 @@
-import { graph } from "./data.mjs";
-
-//cost function to calculate the cost of a seating arrangement, it takes the arrangement as an array of person names
-function calculateArrangementCost(arrangement) {
-  let totalCost = 0;
-  for (let i = 0; i < arrangement.length - 1; i++) {
-    //skip last person to do it outside with the first one
-    const person1 = arrangement[i];
-    const person2 = arrangement[i + 1];
-
-    totalCost +=
-      graph.get(person1).rest.get(person2) +
-      graph.get(person2).rest.get(person1);
-  }
-  //add the cost of last and first
-  const person1 = arrangement[arrangement.length - 1];
-  const person2 = arrangement[0];
-  totalCost +=
-    graph.get(person1).rest.get(person2) + graph.get(person2).rest.get(person1);
-
-  return totalCost;
-}
+import { graph, names } from "./data.mjs";
+import { calculateArrangementCost, shuffle } from "./main.mjs";
 
 //generate all possible random neighbor arrangements out of single arrangement, so hill climbing can move around and see which is the best neighbor (lower arrangement cost)
 function generateNeighbors(arrangement) {
@@ -30,5 +10,53 @@ function generateNeighbors(arrangement) {
       [neighbor[i], neighbor[j]] = [neighbor[j], neighbor[i]];
     }
   }
-  return neighbors;
+  return neighbors; // array of randomly generated seating arrangements
+}
+
+export function hillClimbing(numRestarts = 100) {
+  let bestArrangement = null;
+  let bestCost = Number.POSITIVE_INFINITY;
+
+  //here to make multiple restarts, it helps avoid local minima
+  for (let r = 0; r < numRestarts; r++) {
+    // Initial random arrangement
+    let currentArrangement = [];
+    for (let i = 0; i < 10; i++) {
+      currentArrangement.push(names[i]);
+    }
+    shuffle(currentArrangement);
+    let currentCost = calculateArrangementCost(currentArrangement);
+    let improving = true;
+
+    while (improving) {
+      //what is the best cost out of all neighbors
+      const neighbors = generateNeighbors(currentArrangement);
+      let bestNeighborCost = Infinity;
+      let bestNeighbor = null;
+
+      for (const neighbor of neighbors) {
+        //traversing the neighbors to see which has the best cost
+        const cost = calculateArrangementCost(neighbor);
+        if (cost < bestNeighborCost) {
+          bestNeighborCost = cost;
+          bestNeighbor = neighbor;
+        }
+      }
+
+      if (bestNeighborCost < currentCost) {
+        currentArrangement = bestNeighbor; //this is better neighbor arrangement from the previous arrangement
+        currentCost = bestNeighborCost;
+      } else {
+        improving = false;
+      }
+    }
+
+    if (currentCost < bestCost) {
+      //you may find a better cost out of a different stat k better than a whole solution in another area (best solution in area A , ive found a neighbor in area B which is better than the best solution in area A)
+      bestArrangement = currentArrangement;
+      bestCost = currentCost;
+    }
+  }
+
+  return { bestArrangement, bestCost };
 }

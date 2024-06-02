@@ -1,6 +1,6 @@
 "use strict";
 import { Node } from "./Node.mjs";
-const names = [
+export const names = [
   "Ahmed",
   "Salem",
   "Ayman",
