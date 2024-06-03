@@ -7,9 +7,10 @@ function generateRandomArrangement() {
     currentArrangement.push(names[i]);
   }
   shuffle(currentArrangement);
+  return currentArrangement;
 }
 
-//get randomized indivisual
+//get randomized individuals
 function createPopulation(populationSize) {
   const population = [];
   for (let i = 0; i < populationSize; i++) {
@@ -33,7 +34,7 @@ function select(population, costs, elitismRate) {
 function multiCrossover(parent1, parent2) {
   //both of those parents are individuals e.g. ["Ahmed",...]
   const size = parent1.length; //for our case its 10
-  const point1 = Math.floor(Math.random() * size); //from 0 - 9
+  let point1 = Math.floor(Math.random() * size); //from 0 - 9
   let point2 = Math.floor(Math.random() * size); //from 0 - 9
 
   //ensure point2 is different from point1 so we can perform cross at different points
@@ -46,19 +47,28 @@ function multiCrossover(parent1, parent2) {
     [point1, point2] = [point2, point1]; //swapping the points
   }
 
-  //create children by slicing and swapping segments
-  const child1 = [
-    ...parent1.slice(0, point1),
-    ...parent2.slice(point1, point2),
-    ...parent1.slice(point2),
-  ];
+  const child1 = Array(size).fill(-1);
+  const child2 = Array(size).fill(-1);
 
-  const child2 = [
-    ...parent2.slice(0, point1),
-    ...parent1.slice(point1, point2),
-    ...parent2.slice(point2),
-  ];
+  //copy segments from parents to children
+  for (let i = point1; i <= point2; i++) {
+    child1[i] = parent1[i];
+    child2[i] = parent2[i];
+  }
 
+  //fill remaining positions for child1 from parent1
+  for (let i = 0; i < size; i++) {
+    if (child1[i] === -1) {
+      child1[i] = parent1[i];
+    }
+  }
+
+  //fill remaining positions for child2 from parent2
+  for (let i = 0; i < size; i++) {
+    if (child2[i] === -1) {
+      child2[i] = parent2[i];
+    }
+  }
   return [child1, child2];
 }
 
@@ -74,4 +84,45 @@ function mutate(arrangement, mutationRate) {
     }
   }
   return arrangement;
+}
+
+//genetic algorithm
+export function geneticAlgorithm(
+  populationSize = 100,
+  numGenerations = 1000,
+  mutationRate = 0.1
+) {
+  let population = createPopulation(populationSize);
+
+  for (let generation = 0; generation < numGenerations; generation++) {
+    //here we calculate the cost of each individual in the population
+    const costs = population.map((arrangement) =>
+      calculateArrangementCost(arrangement).toFixed(2)
+    );
+    const selected = select(population, costs, 0.6); //we get the elite individuals out of the population
+
+    const newPopulation = [];
+    while (newPopulation.length < populationSize) {
+      //random individuals from the elites
+      const parent1 = selected[Math.floor(Math.random() * selected.length)];
+      const parent2 = selected[Math.floor(Math.random() * selected.length)];
+
+      let [child1, child2] = multiCrossover(parent1, parent2);
+      child1 = mutate(child1, mutationRate);
+      child2 = mutate(child2, mutationRate);
+      newPopulation.push(child1);
+      if (newPopulation.length < populationSize) {
+        newPopulation.push(child2);
+      }
+    }
+
+    population = newPopulation;
+  }
+
+  console.log(population);
+  const costs = population.map((arrangement) =>
+    calculateArrangementCost(arrangement)
+  );
+  const bestIndex = costs.indexOf(Math.min(...costs)); //get the index of the minimum cost out of this population
+  return { bestArrangement: population[bestIndex], bestCost: costs[bestIndex] };
 }
