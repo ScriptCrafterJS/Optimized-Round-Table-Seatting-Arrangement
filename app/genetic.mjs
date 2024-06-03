@@ -1,4 +1,4 @@
-import { graph, names } from "./data.mjs";
+import { names } from "./data.mjs";
 import { calculateArrangementCost, shuffle } from "./main.mjs";
 
 function generateRandomArrangement() {
@@ -21,25 +21,25 @@ function createPopulation(populationSize) {
 }
 
 //selects the top 60% of the population based on their costs
-function select(population, costs, elitismRate) {
+function select(population, costs, elitism) {
   const sortedIndices = costs
     .map((cost, index) => ({ cost, index })) //look at the element as an object
     .sort((a, b) => a.cost - b.cost) // sort the elements based on their costs
     .map((item) => item.index); //array of individuals indexes sorted based on individual cost
 
-  const numSelected = Math.floor(elitismRate * population.length);
+  const numSelected = Math.trunc(elitism * population.length);
   return sortedIndices.slice(0, numSelected).map((index) => population[index]); //here we bring over the elite individuals from the population
 }
 
 function multiCrossover(parent1, parent2) {
   //both of those parents are individuals e.g. ["Ahmed",...]
   const size = parent1.length; //for our case its 10
-  let point1 = Math.floor(Math.random() * size); //from 0 - 9
-  let point2 = Math.floor(Math.random() * size); //from 0 - 9
+  let point1 = Math.trunc(Math.random() * size); //from 0 - 9
+  let point2 = Math.trunc(Math.random() * size); //from 0 - 9
 
   //ensure point2 is different from point1 so we can perform cross at different points
   while (point2 === point1) {
-    point2 = Math.floor(Math.random() * size); //to pic different point to cross
+    point2 = Math.trunc(Math.random() * size); //to pic different point to cross
   }
 
   //just to make the cross points in order to ensure just in case.
@@ -50,7 +50,7 @@ function multiCrossover(parent1, parent2) {
   const child1 = Array(size).fill(-1);
   const child2 = Array(size).fill(-1);
 
-  //copy segments from parents to children
+  //copy middle parts from parents to children
   for (let i = point1; i <= point2; i++) {
     child1[i] = parent1[i];
     child2[i] = parent2[i];
@@ -79,7 +79,7 @@ function mutate(arrangement, mutationRate) {
     //for each single item in the arrangement it has 10% chance of being mutated
     //the random is from 0 - 1
     if (Math.random() <= mutationRate) {
-      const j = Math.floor(Math.random() * size); //in our case index from 0 - 9
+      const j = Math.trunc(Math.random() * size); //in our case index from 0 - 9
       [arrangement[i], arrangement[j]] = [arrangement[j], arrangement[i]];
     }
   }
@@ -87,11 +87,7 @@ function mutate(arrangement, mutationRate) {
 }
 
 //genetic algorithm
-export function geneticAlgorithm(
-  populationSize = 100,
-  numGenerations = 1000,
-  mutationRate = 0.1
-) {
+export function geneticAlgorithm(populationSize, numGenerations, mutationRate) {
   let population = createPopulation(populationSize);
 
   for (let generation = 0; generation < numGenerations; generation++) {
@@ -104,8 +100,8 @@ export function geneticAlgorithm(
     const newPopulation = [];
     while (newPopulation.length < populationSize) {
       //random individuals from the elites
-      const parent1 = selected[Math.floor(Math.random() * selected.length)];
-      const parent2 = selected[Math.floor(Math.random() * selected.length)];
+      const parent1 = selected[Math.trunc(Math.random() * selected.length)];
+      const parent2 = selected[Math.trunc(Math.random() * selected.length)];
 
       let [child1, child2] = multiCrossover(parent1, parent2);
       child1 = mutate(child1, mutationRate);

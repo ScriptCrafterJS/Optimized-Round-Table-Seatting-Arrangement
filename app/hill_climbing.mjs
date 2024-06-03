@@ -1,4 +1,4 @@
-import { graph, names } from "./data.mjs";
+import { names } from "./data.mjs";
 import { calculateArrangementCost, shuffle } from "./main.mjs";
 
 //generate all possible random neighbor arrangements out of single arrangement, so hill climbing can move around and see which is the best neighbor (lower arrangement cost)
@@ -10,7 +10,7 @@ function generateNeighbors(arrangement) {
       [neighbor[i], neighbor[j]] = [neighbor[j], neighbor[i]];
     }
   }
-  return neighbors; // array of randomly generated seating arrangements
+  return neighbors; //array of randomly generated seating arrangements
 }
 
 export function hillClimbing(numRestarts = 100) {
@@ -19,7 +19,7 @@ export function hillClimbing(numRestarts = 100) {
 
   //here to make multiple restarts, it helps avoid local minima
   for (let r = 0; r < numRestarts; r++) {
-    // Initial random arrangement
+    //initial random arrangement
     let currentArrangement = [];
     for (let i = 0; i < 10; i++) {
       currentArrangement.push(names[i]);
