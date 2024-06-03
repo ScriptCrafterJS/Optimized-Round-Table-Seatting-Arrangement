@@ -29,3 +29,35 @@ function select(population, costs, elitismRate) {
   const numSelected = Math.floor(elitismRate * population.length);
   return sortedIndices.slice(0, numSelected).map((index) => population[index]); //here we bring over the elite individuals from the population
 }
+
+function multiCrossover(parent1, parent2) {
+  //both of those parents are individuals e.g. ["Ahmed",...]
+  const size = parent1.length; //for our case its 10
+  const point1 = Math.floor(Math.random() * size); //from 0 - 9
+  let point2 = Math.floor(Math.random() * size); //from 0 - 9
+
+  //ensure point2 is different from point1 so we can perform cross at different points
+  while (point2 === point1) {
+    point2 = Math.floor(Math.random() * size); //to pic different point to cross
+  }
+
+  //just to make the cross points in order to ensure just in case.
+  if (point1 > point2) {
+    [point1, point2] = [point2, point1]; //swapping the points
+  }
+
+  //create children by slicing and swapping segments
+  const child1 = [
+    ...parent1.slice(0, point1),
+    ...parent2.slice(point1, point2),
+    ...parent1.slice(point2),
+  ];
+
+  const child2 = [
+    ...parent2.slice(0, point1),
+    ...parent1.slice(point1, point2),
+    ...parent2.slice(point2),
+  ];
+
+  return [child1, child2];
+}
