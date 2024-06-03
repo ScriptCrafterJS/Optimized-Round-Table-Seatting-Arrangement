@@ -1,6 +1,7 @@
 // this is the main driver of the program
 import { graph } from "./data.mjs";
 import { hillClimbing } from "./hill_climbing.mjs";
+import { geneticAlgorithm } from "./genetic.mjs";
 //cost function to calculate the cost of a seating arrangement, it takes the arrangement as an array of person names
 export function calculateArrangementCost(arrangement) {
   let totalCost = 0;
@@ -40,6 +41,14 @@ export function shuffle(array) {
   }
 }
 
-const result = hillClimbing(100);
-console.log("Best arrangement:", result.bestArrangement);
-console.log("Best cost:", result.bestCost);
+console.log("Hill Climbing:");
+const HCResult = hillClimbing(100);
+console.log("Best arrangement:", HCResult.bestArrangement);
+console.log("Best cost:", HCResult.bestCost.toFixed(2));
+
+console.log();
+
+const GAResult = geneticAlgorithm(100, 1000, 0.1);
+console.log("Genetic Algorithm:");
+console.log("Best arrangement:", GAResult.bestArrangement);
+console.log("Best cost:", GAResult.bestCost.toFixed(2));

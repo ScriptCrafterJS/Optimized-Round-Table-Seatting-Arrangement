@@ -119,7 +119,6 @@ export function geneticAlgorithm(
     population = newPopulation;
   }
 
-  console.log(population);
   const costs = population.map((arrangement) =>
     calculateArrangementCost(arrangement)
   );
