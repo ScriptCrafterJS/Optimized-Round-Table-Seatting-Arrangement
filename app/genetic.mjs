@@ -61,3 +61,17 @@ function multiCrossover(parent1, parent2) {
 
   return [child1, child2];
 }
+
+//mutation rate of 10%
+function mutate(arrangement, mutationRate) {
+  const size = arrangement.length; //in our case it's 10
+  for (let i = 0; i < size; i++) {
+    //for each single item in the arrangement it has 10% chance of being mutated
+    //the random is from 0 - 1
+    if (Math.random() <= mutationRate) {
+      const j = Math.floor(Math.random() * size); //in our case index from 0 - 9
+      [arrangement[i], arrangement[j]] = [arrangement[j], arrangement[i]];
+    }
+  }
+  return arrangement;
+}
